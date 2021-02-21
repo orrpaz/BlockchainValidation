@@ -62,7 +62,8 @@ public:
         if (!newTransaction.from || !newTransaction.to || !newTransaction.fee || !newTransaction.creationTime
         || !newTransaction.amount)
             return false;
-        // check if sender is not the reciver
+
+        // assume the sender cant send to himself.
         if (newTransaction.from == newTransaction.to)
             return false;
 
@@ -97,12 +98,12 @@ public:
 
 
 
-        // take care if the sender is not enough money to make transaction.
+        // take care if the sender has not enough money to make transaction.
         Address fromNewTransaction = newTransaction.from;
         curr = m_firstBlock;
         uint64_t walletSender = 0;
         while(curr != NULL) {
-            if (fromNewTransaction == m_firstBlock->miner) {
+            if (fromNewTransaction == curr->miner) {
                 walletSender += MONEY_CREATED_FOR_THE_MINER_EACH_BLOCK;
             }
             for (auto &it : curr->trans) {
@@ -113,6 +114,7 @@ public:
                     walletSender += it.amount;
                 }
 
+
                 if (fromNewTransaction == curr->miner) {
                     walletSender += it.fee;
                 }
@@ -120,7 +122,7 @@ public:
             }
             curr = curr->next;
         }
-         // there isnt not enough money to make transaction.
+         // there is not enough money to make transaction.
         if(newTransaction.amount + newTransaction.fee > walletSender){
             return false;
         }
