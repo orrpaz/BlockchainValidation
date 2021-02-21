@@ -101,28 +101,27 @@ public:
         Address fromNewTransaction = newTransaction.from;
         curr = m_firstBlock;
         uint64_t walletSender = 0;
-        while(curr != NULL){
-            if(fromNewTransaction == m_firstBlock->miner){
+        while(curr != NULL) {
+            if (fromNewTransaction == m_firstBlock->miner) {
                 walletSender += MONEY_CREATED_FOR_THE_MINER_EACH_BLOCK;
             }
-            for(auto& it : curr->trans){
-                if(it.from == fromNewTransaction) {
+            for (auto &it : curr->trans) {
+                if (it.from == fromNewTransaction) {
                     walletSender -= it.amount;
                     walletSender -= it.fee;
-                }
-                else if(it.to == fromNewTransaction){
+                } else if (it.to == fromNewTransaction) {
                     walletSender += it.amount;
                 }
-                else {
-                    if(fromNewTransaction == curr->miner) {
-                        walletSender += it.fee;
-                    }
 
+                if (fromNewTransaction == curr->miner) {
+                    walletSender += it.fee;
                 }
+
             }
             curr = curr->next;
         }
-        if(newTransaction.amount + newTransaction.fee < walletSender){
+         // there isnt not enough money to make transaction.
+        if(newTransaction.amount + newTransaction.fee > walletSender){
             return false;
         }
 
